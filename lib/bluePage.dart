@@ -8,6 +8,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:math';
 
 class BluePage extends StatefulWidget {
   BluePage({Key? key, required this.title}) : super(key: key);
@@ -16,74 +17,66 @@ class BluePage extends StatefulWidget {
 final FlutterBlue flutterBlue = FlutterBlue.instance;
 final List<ScanResult> devicesList = <ScanResult>[];
 
+
   @override
   State<BluePage> createState() => _BluePageState();
 }
- FlutterBlue flutterBlue = FlutterBlue.instance;
 class _BluePageState extends State<BluePage> {
+  Map<dynamic, dynamic> map = {};
+  ValueNotifier <double> _notifier = ValueNotifier<double>(-1.0);
 late double powerValue;
+
    @override
  void initState() {
+      widget.flutterBlue.startScan();
    super.initState();
-   
-   widget.flutterBlue.scanResults
-   .listen((List<ScanResult> devices) {
-     for (ScanResult device in devices) {
-       addDeviceToList(device);
-     }
-   });
-   widget.flutterBlue.scanResults.listen((List<ScanResult> results) {
-     for (ScanResult result in results) {
-       addDeviceToList(result);
-     }
-   });
- widget.flutterBlue.startScan();
+    SCANRESULTS();
 
- new Timer.periodic(Duration (seconds: 5), (Timer t) => setState(() {
-    widget.flutterBlue.stopScan();
-     Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => BluePage(title: 'bluE')));
-     Fluttertoast.showToast(  
-        msg: 'Refreshing...',  
-        toastLength: Toast.LENGTH_SHORT,    
-        gravity: ToastGravity.BOTTOM,  
-        timeInSecForIosWeb: 1,  
-        backgroundColor: Colors.black,  
-        textColor: Colors.white 
-    );
-     }));
+//  new Timer.periodic(Duration (seconds: 5), (Timer t) => setState(() {
+ 
+//     widget.flutterBlue.stopScan();
+//      }));
 
 
  }
+Future<void> SCANRESULTS()async {
+  widget.flutterBlue.scanResults
+   .listen((List<ScanResult> devices) {
+     for (ScanResult devices in devices) {
+       addDeviceToList(devices);
+       map[devices]=devices.rssi;
+       print(map);
+       setState(() {
+         
+       });
+     }
+   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-         title: Text(widget.title),
-         backgroundColor: Colors.black,
-       ),
-       body: viewDevices(),
-    );
-  }
-  addDeviceToList(final ScanResult device) {
-   if (!widget.devicesList.contains(device)) {
-     setState(() {
-     
-       widget.devicesList.add(device);
-     });
-   }
-   
+  //  widget.flutterBlue.scanResults.listen((List<ScanResult> results) {
+  //    for (ScanResult result in results) {
+  //      addDeviceToList(result);
+  //    }
+  //  });
+ 
+  return Future.delayed(Duration(seconds: 5));
+
  }
  
+  @override
+  Widget build(BuildContext context) {
 
-  ListView viewDevices() {
+ListView viewDevices() {
    
    List<Container> containers = <Container>[];
    for (ScanResult device in widget.devicesList) {
      powerValue=(double.parse(((pow(10, (-69-device.rssi)/30))).toStringAsFixed(5))) as double;
+     
+     
    
-setState(() {
+  setState(() {
      powerValue;
+     print(device.rssi);
+
      });
      containers.add(
       
@@ -121,6 +114,24 @@ setState(() {
    );
 
 
+ }
+    return Scaffold(
+      appBar: AppBar(
+         title: Text(widget.title),
+         backgroundColor: Colors.black,
+       ),
+       body: viewDevices(),
+    );
+  }
+  addDeviceToList(final ScanResult device) {
+   if (!widget.devicesList.contains(device)) {
+     setState(() {
+       widget.devicesList.add(device);
+        map[device]=device.rssi;
+       print(map);
+     });
+   }
+   
  }
   
 }
