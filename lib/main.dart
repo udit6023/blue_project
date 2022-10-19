@@ -1,17 +1,42 @@
 import 'package:blue_project/bluePage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-void main() {
-  runApp(const MyApp());
+
+// checkPerm() async {    
+// var status = await Permission.bluetooth.status;
+// if (status.isDenied) {
+//  print(1);
+//   await Permission.bluetooth.request();
+// }
+
+// if (await Permission.bluetooth.status.isPermanentlyDenied) {
+//   print(2);
+//   openAppSettings();
+// }
+
+// }
+void main() async{
+ 
+  WidgetsFlutterBinding.ensureInitialized();
+  // checkPerm();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(const MyApp());
+  });
+  
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
